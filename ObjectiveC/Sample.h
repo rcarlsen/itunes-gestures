@@ -12,6 +12,12 @@
 extern NSString* kScreenTapNotification;
 extern NSString* kCircleClockwiseNotification;
 extern NSString* kCircleCounterClockwiseNotification;
+extern NSString* kSwipeLeftNotification;
+extern NSString* kSwipeRightNotification;
+extern NSString* kSwipeUpNotification;
+extern NSString* kSwipeDownNotification;
+extern NSString* kSwipeForwardNotification;
+extern NSString* kSwipeBackwardNotification;
 
 @interface Sample : NSObject<LeapListener>
 

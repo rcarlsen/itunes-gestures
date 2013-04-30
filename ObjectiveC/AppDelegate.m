@@ -38,7 +38,16 @@
                                              selector:@selector(volumeDown:)
                                                  name:kCircleCounterClockwiseNotification
                                                object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(nextTrack:)
+                                                 name:kSwipeRightNotification
+                                               object:nil];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(previousTrack:)
+                                                 name:kSwipeLeftNotification
+                                               object:nil];
     
     [_gestureLabel setStringValue:@""];
 }
@@ -73,7 +82,26 @@
     }
 }
 
+-(void)nextTrack:(NSNotification*)notification;
+{
+    NSLog(@"%s",__PRETTY_FUNCTION__);
+    [_gestureLabel setStringValue:@"Swipe Right"];
+    
+    if ( [_iTunes isRunning] ) {
+        [_iTunes nextTrack];
+    }
+}
 
+
+-(void)previousTrack:(NSNotification*)notification;
+{
+    NSLog(@"%s",__PRETTY_FUNCTION__);
+    [_gestureLabel setStringValue:@"Swipe Left"];
+    
+    if ( [_iTunes isRunning] ) {
+        [_iTunes previousTrack];
+    }
+}
 
 - (void)play:(id)sender {
     NSLog(@"%s",__PRETTY_FUNCTION__);

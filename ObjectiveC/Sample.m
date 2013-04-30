@@ -11,7 +11,12 @@
 NSString* kScreenTapNotification = @"kScreenTapNotification";
 NSString* kCircleClockwiseNotification = @"kCircleClockwiseNotification";
 NSString* kCircleCounterClockwiseNotification = @"kCircleCounterClockwiseNotification";
-
+NSString* kSwipeLeftNotification = @"kSwipeLeftNotification";
+NSString* kSwipeRightNotification = @"kSwipeRightNotification";
+NSString* kSwipeUpNotification = @"kSwipeUpNotification";
+NSString* kSwipeDownNotification = @"kSwipeDownNotification";
+NSString* kSwipeForwardNotification = @"kSwipeForwardNotification";
+NSString* kSwipeBackwardNotification = @"kSwipeBackwardNotification";
 
 @implementation Sample
 {
@@ -21,6 +26,8 @@ NSString* kCircleCounterClockwiseNotification = @"kCircleCounterClockwiseNotific
 - (void)run
 {
     controller = [[LeapController alloc] init];
+    [controller setPolicyFlags:LEAP_POLICY_BACKGROUND_FRAMES];
+    
     [controller addListener:self];
     NSLog(@"running");
 }
@@ -137,6 +144,50 @@ NSString* kCircleCounterClockwiseNotification = @"kCircleCounterClockwiseNotific
                 NSLog(@"Swipe id: %d, %@, position: %@, direction: %@, speed: %f",
                       swipeGesture.id, [Sample stringForState:swipeGesture.state],
                       swipeGesture.position, swipeGesture.direction, swipeGesture.speed);
+                
+                // only send the notification if the state is "started"
+                // TODO: use the speed to differentiate between types of swipes (drag/ongoing, fast/one-time)
+                if (swipeGesture.state == LEAP_GESTURE_STATE_START) {
+                    LeapVector *direction = swipeGesture.direction;
+                    float x = direction.x;
+                    float y = direction.y;
+                    float z = direction.z;
+                    
+                    NSString *name = nil;
+                    
+                    if (fabs(x) > fabs(y) && fabs(x) > fabs(z)) {
+                        // horizontal (lateral)
+                        if (x > 0) {
+                            name = kSwipeRightNotification;
+                        }
+                        else {
+                            name = kSwipeLeftNotification;
+                        }
+                    }
+                    else if (fabs(y) > fabs(x) && fabs(y) > fabs(z)) {
+                        // vertical
+                        if (y > 0) {
+                            name = kSwipeUpNotification;
+                        }
+                        else {
+                            name = kSwipeDownNotification;
+                        }
+                    }
+                    else if (fabs(z) > fabs(x) && fabs(z) > fabs(y)) {
+                        // horizontal (longitudinal)
+                        if (z > 0) {
+                            name = kSwipeBackwardNotification;
+                        }
+                        else {
+                            name = kSwipeForwardNotification;
+                        }
+                    }
+                    
+                    if (name) {
+                        [[NSNotificationCenter defaultCenter] postNotificationName:name object:nil];
+                    }
+                }
+                
                 break;
             }
             case LEAP_GESTURE_TYPE_KEY_TAP: {
